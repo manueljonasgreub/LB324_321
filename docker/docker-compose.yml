@@ -1,18 +1,22 @@
-# docker compose for local development
-
 version: "3"
 
 services:
-  # Web GUI
-  
-  # API gateway
+  ApiGateway:
+    image: nginx:alpine-slim
+    container_name: BadeentenApiGateway
+    restart: always
+    volumes:
+      - ./ApiGateway/html:/usr/share/nginx/html:ro
+      - ./ApiGateway/conf/99-apigateway.conf:/etc/nginx/conf.d/99-apigateway.conf:ro
+    ports:
+      - "8000:80"
 
-  # Message Queue
-
-  # ArticleSerivce
-
-  # AuthService
-
-  # ClientService
-
-  # OrderService
+  MessageQueue:
+    image: rabbitmq:3-management-alpine
+    container_name: BadeentenMessageQueue
+    restart: always
+    volumes:
+      - ./MessageQueue/data:/var/lib/rabbitmq
+    ports:
+      - "8001:15672"
+      - "5672:5672"
