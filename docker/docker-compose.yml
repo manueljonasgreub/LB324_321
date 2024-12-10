@@ -20,3 +20,18 @@ services:
     ports:
       - "8001:15672"
       - "5672:5672"
+
+  
+  productservice:
+    depends_on:
+      - MessageQueue
+    build:
+      context: ../src/backend
+      dockerfile: ./ProductService/Dockerfile
+    environment:
+      - RabbitMq__Uri=${RABBITMQ_URI}
+      - RabbitMq__ExchangeName=${RABBITMQ_EXCHANGE}
+    # only expose for debugging / development purposes
+    # in production the service should not be accessible directly from the outside
+    ports:
+      - "8011:8080"
