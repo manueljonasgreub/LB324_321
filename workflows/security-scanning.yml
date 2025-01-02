@@ -1,0 +1,46 @@
+ame: Security Scanning
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: 'csharp'
+
+    - name: Restore dependencies
+      run: |
+        for csproj in $(find . -name '*.csproj' -type f | grep -v 'Backup'); do
+          echo "Restoring dependencies for $csproj"
+          dotnet restore "$csproj"
+        done
+
+    - name: Build the code
+      run: |
+        for csproj in $(find . -name '*.csproj' -type f | grep -v 'Backup'); do
+          echo "Building $csproj"
+          dotnet build "$csproj" --configuration Release
+        done
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
