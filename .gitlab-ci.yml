@@ -7,13 +7,16 @@ stages:
 
 variables:
   DOTNET_VERSION: "8.0.x"
-  PROJECT_ID: "my-project" # Update to your Google Cloud project ID
-  REGION: "us-central1"    # Update to your region
-  SERVICE: "my-service"    # Update to your service name
+  PROJECT_ID: "my-project" # Replace with your Google Cloud project ID
+  REGION: "us-central1"    # Replace with your preferred region
+  SERVICE: "my-service"    # Replace with your Cloud Run service name
 
 build:
   stage: build
   script:
+    - apt-get update && apt-get install -y curl
+    - curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version $DOTNET_VERSION
+    - export PATH="$PATH:$HOME/.dotnet"
     - dotnet --version
     - for csproj in $(find . -name '*.csproj' -type f | grep -v 'Backup'); do
         echo "Restoring $csproj";
