@@ -1,0 +1,67 @@
+stages:
+  - build
+  - test
+  - security
+  - analysis
+  - deploy
+
+variables:
+  DOTNET_VERSION: "8.0.x"
+  PROJECT_ID: "my-project" # Update to your Google Cloud project ID
+  REGION: "us-central1"    # Update to your region
+  SERVICE: "my-service"    # Update to your service name
+
+build:
+  stage: build
+  script:
+    - dotnet --version
+    - for csproj in $(find . -name '*.csproj' -type f | grep -v 'Backup'); do
+        echo "Restoring $csproj";
+        dotnet restore "$csproj";
+      done
+    - for csproj in $(find . -name '*.csproj' -type f | grep -v 'Backup'); do
+        echo "Building $csproj";
+        dotnet build "$csproj" --no-restore --configuration Release;
+      done
+  artifacts:
+    paths:
+      - **/bin/Release/
+      - **/obj/Release/
+
+test:
+  stage: test
+  script:
+    - for testproj in $(find . -name '*test.csproj' -type f | grep -v 'Backup'); do
+        echo "Testing $testproj";
+        dotnet test "$testproj" --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory $(pwd)/TestResults;
+      done
+  artifacts:
+    paths:
+      - '**/TestResults/*.trx'
+      - '**/TestResults/**/*.xml'
+
+security_scan:
+  stage: security
+  script:
+    - dotnet tool install --global dotnet-format
+    - for csproj in $(find . -name '*.csproj' -type f | grep -v 'Backup'); do
+        echo "Running code analysis on $csproj";
+        dotnet format style --verify-no-changes --no-restore "$csproj";
+      done
+
+deploy_to_cloud_run:
+  stage: deploy
+  script:
+    - echo "Deploying to Cloud Run"
+    - gcloud run deploy $SERVICE --source . --region $REGION --project $PROJECT_ID
+
+deploy_to_server:
+  stage: deploy
+  script:
+    - ssh $SERVER_USER@$SERVER_HOST << EOF
+        cd microservice-based-grade-management
+        git pull origin main
+        docker-compose pull
+        docker-compose down
+        docker-compose up -d
+      EOF
