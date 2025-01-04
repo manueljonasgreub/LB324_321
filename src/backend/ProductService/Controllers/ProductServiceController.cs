@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProductService.Models;
 
 namespace ProductService.Controllers
@@ -7,23 +8,23 @@ namespace ProductService.Controllers
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
-        private static readonly List<Product> Products = new List<Product>
+        private readonly ProductContext _context;
+
+        public ProductController(ProductContext context)
         {
-            new Product { Id = 1, Name = "Classic Duck", Price = 5.99m, Description = "A classic yellow bath duck.", ImageURL = "https://i.imgur.com/fO4vNtG.png" },
-            new Product { Id = 2, Name = "Pirate Duck", Price = 7.49m, Description = "A pirate-themed bath duck.", ImageURL = "https://i.imgur.com/fO4vNtG.png" },
-            new Product { Id = 3, Name = "Glow Duck", Price = 9.99m, Description = "A glow-in-the-dark bath duck.", ImageURL = "https://i.imgur.com/fO4vNtG.png" },
-        };
+            _context = context;
+        }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Product>> GetProducts()
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return Ok(Products);
+            return Ok(await _context.Products.ToListAsync());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Product> GetProduct(int id)
+        public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = Products.FirstOrDefault(p => p.Id == id);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
             {
                 return NotFound($"Product with Id {id} not found.");
@@ -32,17 +33,17 @@ namespace ProductService.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Product> AddProduct(Product product)
+        public async Task<ActionResult<Product>> AddProduct(Product product)
         {
-            product.Id = Products.Max(p => p.Id) + 1;
-            Products.Add(product);
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
 
         [HttpPut("{id}")]
-        public ActionResult UpdateProduct(int id, Product updatedProduct)
+        public async Task<ActionResult> UpdateProduct(int id, Product updatedProduct)
         {
-            var product = Products.FirstOrDefault(p => p.Id == id);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
             {
                 return NotFound($"Product with Id {id} not found.");
@@ -53,19 +54,21 @@ namespace ProductService.Controllers
             product.Description = updatedProduct.Description;
             product.ImageURL = updatedProduct.ImageURL;
 
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteProduct(int id)
+        public async Task<ActionResult> DeleteProduct(int id)
         {
-            var product = Products.FirstOrDefault(p => p.Id == id);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
             {
                 return NotFound($"Product with Id {id} not found.");
             }
 
-            Products.Remove(product);
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
             return NoContent();
         }
     }

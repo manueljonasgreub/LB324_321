@@ -10,28 +10,26 @@ services:
       - ./ApiGateway/conf/99-apigateway.conf:/etc/nginx/conf.d/99-apigateway.conf:ro
     ports:
       - "8000:80"
-
-  MessageQueue:
-    image: rabbitmq:3-management-alpine
-    container_name: BadeentenMessageQueue
-    restart: always
-    volumes:
-      - ./MessageQueue/data:/var/lib/rabbitmq
-    ports:
-      - "8001:15672"
-      - "5672:5672"
-
+  
   
   productservice:
-    depends_on:
-      - MessageQueue
     build:
       context: ../src/backend
       dockerfile: ./ProductService/Dockerfile
-    environment:
-      - RabbitMq__Uri=${RABBITMQ_URI}
-      - RabbitMq__ExchangeName=${RABBITMQ_EXCHANGE}
+    volumes:
+      - ./docker/ProductService-data:/app/ProductService-data
     # only expose for debugging / development purposes
     # in production the service should not be accessible directly from the outside
     ports:
       - "8011:8080"
+
+  orderservice:
+    build:
+      context: ../src/backend
+      dockerfile: ./OrderService/Dockerfile
+    volumes:
+      - ./docker/OrderService-data:/app/OrderService-data
+    # only expose for debugging / development purposes
+    # in production the service should not be accessible directly from the outside
+    ports:
+      - "8012:8080"

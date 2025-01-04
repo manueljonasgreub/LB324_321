@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ProductService;
+using OrderService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,14 +20,14 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddDbContext<ProductContext>(options =>
-    options.UseSqlite("Data Source=/app/ProductService-data/products.db"));
+builder.Services.AddDbContext<OrderContext>(options =>
+    options.UseSqlite("Data Source=/app/OrderService-data/orders.db"));
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ProductContext>();
+    var db = scope.ServiceProvider.GetRequiredService<OrderContext>();
     db.Database.EnsureCreated();
 }
 
