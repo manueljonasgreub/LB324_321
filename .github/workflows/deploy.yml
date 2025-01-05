@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}    # The password for the user
           script: |
             if [ ! -d "/home/deployalberto/my-project" ]; then
-            git clone https://github.com/yourusername/your-repository.git /home/deployalberto/my-project
+            git clone deployalberto@sprudello.ch /home/deployalberto/my-project
             fi
             cd /home/deployalberto/my-project
             git pull origin main
