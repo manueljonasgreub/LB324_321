@@ -6,7 +6,7 @@ services:
     container_name: BadeentenApiGateway
     restart: always
     volumes:
-      - ./ApiGateway/html:/usr/share/nginx/html:ro
+      - ../src/frontend:/usr/share/nginx/html:ro
       - ./ApiGateway/conf/99-apigateway.conf:/etc/nginx/conf.d/99-apigateway.conf:ro
     ports:
       - "7070:80"

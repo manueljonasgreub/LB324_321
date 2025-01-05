@@ -3,85 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product API Frontend</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        .product-list, .form-section {
-            margin-bottom: 20px;
-        }
-        .product {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-    </style>
+    <title>Badeenten Shop</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Product API Frontend</h1>
+    <header>
+        <h1>Willkommen im Badeenten-Shop</h1>
+        <nav>
+            <a href="#products">Produkte</a>
+            <a href="#cart">Warenkorb</a>
+        </nav>
+    </header>
 
-    <div class="product-list">
-        <h2>Product List</h2>
-        <button onclick="getProducts()">Load Products</button>
-        <div id="products"></div>
-    </div>
+    <main>
+        <section id="products">
+            <h2>Unsere Produkte</h2>
+            <div class="product-list" id="product-list"></div>
+        </section>
 
-    <div class="form-section">
-        <h2>Add Product</h2>
-        <form id="addProductForm" onsubmit="addProduct(event)">
-            <input type="text" id="name" placeholder="Name" required>
-            <input type="number" id="price" placeholder="Price" required step="0.01">
-            <input type="text" id="description" placeholder="Description" required>
-            <input type="url" id="imageURL" placeholder="Image URL" required>
-            <button type="submit">Add Product</button>
-        </form>
-    </div>
+        <section id="cart">
+            <h2>Ihr Warenkorb</h2>
+            <div class="cart-items" id="cart-items">
+                <p>Ihr Warenkorb ist leer.</p>
+            </div>
+            <button id="checkout-button" disabled>Zur Kasse</button>
+        </section>
 
-    <script>
-        const API_URL = "http://localhost:7020/api/Product";
+        <section id="checkout" class="hidden">
+            <h2>Bestellung abschließen</h2>
+            <form id="checkout-form">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
 
-        async function getProducts() {
-            const response = await fetch(API_URL);
-            const products = await response.json();
-            const productsDiv = document.getElementById("products");
-            productsDiv.innerHTML = "";
-            products.forEach(product => {
-                const productDiv = document.createElement("div");
-                productDiv.classList.add("product");
-                productDiv.innerHTML = `
-                    <p><strong>${product.name}</strong></p>
-                    <p>Price: $${product.price}</p>
-                    <p>${product.description}</p>
-                    <img src="${product.imageURL}" alt="${product.name}" style="width:100px;">
-                    <button onclick="deleteProduct(${product.id})">Delete</button>
-                `;
-                productsDiv.appendChild(productDiv);
-            });
-        }
+                <label for="address">Adresse:</label>
+                <textarea id="address" name="address" required></textarea>
 
-        async function addProduct(event) {
-            event.preventDefault();
-            const name = document.getElementById("name").value;
-            const price = parseFloat(document.getElementById("price").value);
-            const description = document.getElementById("description").value;
-            const imageURL = document.getElementById("imageURL").value;
+                <button type="submit">Bestellung abschicken</button>
+            </form>
+        </section>
+    </main>
 
-            const product = { name, price, description, imageURL };
-            await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(product),
-            });
-            document.getElementById("addProductForm").reset();
-            getProducts();
-        }
+    <footer>
+        <p>&copy; 2025 Badeenten Shop. Alle Rechte vorbehalten.</p>
+    </footer>
 
-        async function deleteProduct(id) {
-            await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-            getProducts();
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
