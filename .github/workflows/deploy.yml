@@ -26,6 +26,6 @@ jobs:
             fi
             cd /home/deployalberto/my-project || exit 1
             git pull origin main
-            docker-compose pull || true
-            docker-compose down || true
-            docker-compose up -d
+            docker-compose -f docker/docker-compose.yml pull || true
+            docker-compose -f docker/docker-compose.yml down || true
+            docker-compose -f docker/docker-compose.yml up -d
