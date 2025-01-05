@@ -17,10 +17,9 @@ jobs:
       - name: Deploy to Server
         uses: appleboy/ssh-action@v0.1.8
         with:
-          host: {server_host}
-          port: {server_port}
-          username: {server_user}
-          password: ${{{{ secrets.SERVER_PASSWORD }}}}
+          host: ${{ secrets.SERVER_HOST }}            # The IP address or hostname of your server
+          username: ${{ secrets.SERVER_USER }}        # The username to log into the server
+          password: ${{ secrets.SERVER_PASSWORD }}    # The password for the user
           script: |
             cd /path/to/your/project
             git pull origin main
