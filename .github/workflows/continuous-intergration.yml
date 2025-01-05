@@ -20,9 +20,9 @@ jobs:
       uses: actions/cache@v3
       with:
         path: ~/.nuget/packages
-        key: ${{{{ runner.os }}}}-nuget-${{{{ hashFiles('**/*.csproj') }}}}
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
         restore-keys: |
-          ${{{{ runner.os }}}}-nuget-
+          ${{ runner.os }}-nuget-
     - name: Restore dependencies for all projects
       run: |
         for csproj in $(find . -name '*.csproj' -type f | grep -v 'Backup'); do
