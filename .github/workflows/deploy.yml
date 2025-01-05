@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}    # The password for the user
           script: |
             if [ ! -d "/home/deployalberto/my-project" ]; then
-            git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/yourusername/your-repository.git /home/deployalberto/my-project
+            git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/manueljonasgreub/LB324_321.git /home/deployalberto/my-project
             fi
             cd /home/deployalberto/my-project || exit 1
             git pull origin main
