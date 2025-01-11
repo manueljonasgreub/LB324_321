@@ -28,7 +28,15 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ProductContext>();
-    db.Database.EnsureCreated();
+    try
+    {
+        db.Database.EnsureCreated();
+        Console.WriteLine("Database created successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error creating database: " + ex.Message);
+    }
 }
 
 // Configure the HTTP request pipeline.
