@@ -17,7 +17,7 @@ services:
       context: ../src/backend
       dockerfile: ./ProductService/Dockerfile
     volumes:
-      - ./docker/ProductService-data:/app/ProductService-data
+      - ./docker/docker/ProductService-data:/app/ProductService-data
     # only expose for debugging / development purposes
     # in production the service should not be accessible directly from the outside
     ports:
@@ -28,7 +28,7 @@ services:
       context: ../src/backend
       dockerfile: ./OrderService/Dockerfile
     volumes:
-      - ./docker/OrderService-data:/app/OrderService-data
+      - ./docker/docker/OrderService-data:/app/OrderService-data
     # only expose for debugging / development purposes
     # in production the service should not be accessible directly from the outside
     ports:
