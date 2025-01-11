@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProductService;
 
-Console.WriteLine("Start");
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,7 +10,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-Console.WriteLine("1");
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLiveServer", policy =>
@@ -21,28 +19,16 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
-Console.WriteLine("2");
 
 builder.Services.AddDbContext<ProductContext>(options =>
-    options.UseSqlite("Data Source=products.db"));
-Console.WriteLine("3");
+    options.UseSqlite("Data Source=/app/ProductService-data/products.db"));
 
 var app = builder.Build();
-Console.WriteLine("4");
 
 using (var scope = app.Services.CreateScope())
 {
-    Console.WriteLine("5");
     var db = scope.ServiceProvider.GetRequiredService<ProductContext>();
-    try
-    {
-
-        Console.WriteLine("Database created successfully");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine("Error creating database: " + ex.Message);
-    }
+    db.Database.EnsureCreated();
 }
 
 // Configure the HTTP request pipeline.
