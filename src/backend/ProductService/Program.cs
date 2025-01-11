@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
 Console.WriteLine("2");
 
 builder.Services.AddDbContext<ProductContext>(options =>
-    options.UseSqlite("Data Source=/app/ProductService-data/products.db"));
+    options.UseSqlite("Data Source=products.db"));
 Console.WriteLine("3");
 
 var app = builder.Build();
