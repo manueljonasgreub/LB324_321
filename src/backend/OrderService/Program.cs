@@ -4,6 +4,10 @@ using OrderService;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers();
+var connectionString = builder.Environment.IsDevelopment()
+    ? builder.Configuration.GetConnectionString("DefaultConnection")
+    : builder.Configuration.GetSection("DockerConnectionStrings")["DefaultConnection"];
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -21,7 +25,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddDbContext<OrderContext>(options =>
-    options.UseSqlite("Data Source=/app/OrderService-data/orders.db"));
+    options.UseSqlite(connectionString));
 
 var app = builder.Build();
 
