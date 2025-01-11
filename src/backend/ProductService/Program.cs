@@ -36,7 +36,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ProductContext>();
     try
     {
-        db.Database.EnsureCreated();
+
         Console.WriteLine("Database created successfully");
     }
     catch (Exception ex)
