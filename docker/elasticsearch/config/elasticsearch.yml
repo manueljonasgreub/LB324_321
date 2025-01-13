@@ -1,0 +1,11 @@
+# Cluster-Einstellungen
+cluster.name: "docker-cluster"
+node.name: "node-1"
+discovery.type: "single-node"
+
+# Netzwerkeinstellungen
+network.host: 0.0.0.0
+http.port: 9201
+
+# Sicherheitsfunktionen deaktivieren
+xpack.security.enabled: false

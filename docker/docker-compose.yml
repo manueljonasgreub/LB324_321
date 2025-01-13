@@ -48,15 +48,14 @@ services:
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - es-data:/usr/share/elasticsearch/data
+      - xpack.security.enabled=false
     ports:
-      - "9201:9200"
+      - "9201:9200" 
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - es-data:/usr/share/elasticsearch/data
+    networks:
+      - elk
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.10.2
@@ -75,10 +74,18 @@ services:
     container_name: kibana
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9201
+      - XPACK_SCREENSHOTTING_BROWSER_CHROMIUM_DISABLESANDBOX=true
     ports:
       - "5602:5601"
     depends_on:
       - elasticsearch
+    networks:
+      - elk
+
+
+networks:
+  elk:
+    driver: bridge
 
 volumes:
   es-data:
