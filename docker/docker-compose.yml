@@ -17,8 +17,6 @@ services:
       dockerfile: ./ProductService/Dockerfile
     volumes:
       - ./ProductService-data:/app/ProductService-data
-    # only expose for debugging / development purposes
-    # in production the service should not be accessible directly from the outside
     ports:
       - "8011:8080"
 
@@ -28,8 +26,6 @@ services:
       dockerfile: ./OrderService/Dockerfile
     volumes:
       - ./OrderService-data:/app/OrderService-data
-    # only expose for debugging / development purposes
-    # in production the service should not be accessible directly from the outside
     ports:
       - "8012:8080"
     
