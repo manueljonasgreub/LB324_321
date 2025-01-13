@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warenkorb - Badeentchen-Shop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #ffcc00;
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            margin: 0;
+            color: #333;
+        }
+        nav {
+            margin: 20px 0;
+            text-align: center;
+        }
+        nav a {
+            text-decoration: none;
+            margin: 0 15px;
+            color: #ffcc00;
+            font-size: 18px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: #333;
+        }
+        .cart-container {
+            padding: 20px;
+            text-align: center;
+        }
+        .cart-item {
+            background-color: #fff;
+            margin: 10px auto;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 600px;
+            text-align: left;
+        }
+        .cart-item img {
+            max-width: 100px;
+            height: auto;
+            border-radius: 8px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .cart-item-details {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 20px;
+        }
+        .cart-item-details h2 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+        .cart-item-details p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+        }
+        .cart-item-details .price {
+            font-size: 18px;
+            color: #ff6600;
+            font-weight: bold;
+        }
+        .cart-item-details .quantity {
+            margin-top: 10px;
+        }
+        .cart-item-details input {
+            width: 50px;
+            text-align: center;
+        }
+        .checkout {
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #ffcc00;
+            border: none;
+            border-radius: 5px;
+            color: #333;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .checkout:hover {
+            background-color: #e6b800;
+        }
+        .cart-empty {
+            font-size: 18px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Warenkorb - Badeentchen-Shop</h1>
+    </header>
+    <nav>
+        <a href="index.html">Startseite</a>
+        <a href="produkte.html">Produkte</a>
+    </nav>
+    <div class="cart-container" id="cartContainer">
+        <p class="cart-empty">Ihr Warenkorb ist leer.</p>
+    </div>
+    <script>
+        function loadCart() {
+            const cartContainer = document.getElementById('cartContainer');
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                cartContainer.innerHTML = '<p class="cart-empty">Ihr Warenkorb ist leer.</p>';
+                return;
+            }
+
+            cartContainer.innerHTML = '';
+            let totalPrice = 0;
+            cart.forEach(item => {
+                totalPrice += item.price * item.quantity;
+                const cartItemDiv = document.createElement('div');
+                cartItemDiv.className = 'cart-item';
+                cartItemDiv.innerHTML = `
+                    <img src="${item.imageURL}" alt="${item.name}">
+                    <div class="cart-item-details">
+                        <h2>${item.name}</h2>
+                        <p>Preis: <span class="price">${item.price} €</span></p>
+                        <p class="quantity">Menge: <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${item.id}, this.value)"></p>
+                    </div>
+                `;
+                cartContainer.appendChild(cartItemDiv);
+            });
+
+            const checkoutButton = document.createElement('button');
+            checkoutButton.className = 'checkout';
+            checkoutButton.textContent = `Zur Kasse (Gesamt: ${totalPrice.toFixed(2)} €)`;
+            checkoutButton.onclick = checkout;
+            cartContainer.appendChild(checkoutButton);
+        }
+
+        function updateQuantity(productId, quantity) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart = cart.map(item => item.id === productId ? { ...item, quantity: parseInt(quantity) } : item);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCart();
+        }
+
+        function checkout() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                alert('Ihr Warenkorb ist leer!');
+                return;
+            }
+
+            const customerName = prompt('Bitte geben Sie Ihren Namen ein:');
+            const address = prompt('Bitte geben Sie Ihre Adresse ein:');
+            if (!customerName || !address) {
+                alert('Bitte füllen Sie alle Felder aus.');
+                return;
+            }
+
+            const order = {
+                customerName,
+                address,
+                items: cart
+            };
+
+            fetch('http://195.202.218.245:7070/api/Order/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(order)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Bestellung erfolgreich abgeschickt!');
+                    localStorage.removeItem('cart');
+                    loadCart();
+                })
+                .catch(error => {
+                    alert('Es gab ein Problem mit Ihrer Bestellung. Bitte versuchen Sie es erneut.');
+                    console.error('Error:', error);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCart);
+    </script>
+</body>
+</html>
